@@ -1,0 +1,75 @@
+<!doctype html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Upload ZIP File with Progress and Redirect</title>
+        <style>
+            body { font-family: Arial, sans-serif; }
+            .progress-container { width: 100%; background-color: #f3f3f3; border-radius: 5px; margin-top: 20px; }
+            .progress-bar { width: 0%; height: 20px; background-color: #4caf50; border-radius: 5px; text-align: center; color: white; }
+        </style>
+    </head>
+    <body>
+        <h1>Upload a ZIP File</h1>
+        <form id="uploadForm" method="post" enctype="multipart/form-data">
+            <input type="file" id="fileInput" name="file" accept=".zip" required>
+            <button type="submit">Upload</button>
+        </form>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar">0%</div>
+        </div>
+        <div id="status"></div>
+
+        <script>
+            const form = document.getElementById('uploadForm');
+            const progressBar = document.getElementById('progressBar');
+            const status = document.getElementById('status');
+
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const fileInput = document.getElementById('fileInput');
+                const file = fileInput.files[0];
+                if (!file) {
+                    status.textContent = "No file selected.";
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/view_file', true);
+
+                xhr.upload.onprogress = function(event) {
+                    if (event.lengthComputable) {
+                        const percentComplete = Math.round((event.loaded / event.total) * 100);
+                        progressBar.style.width = percentComplete + '%';
+                        progressBar.textContent = percentComplete + '%';
+                    }
+                };
+
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        status.innerHTML = '<p style="color: green;">Upload successful! Redirecting...</p>';
+                        progressBar.style.backgroundColor = '#4caf50';
+                        // Redirect to the extracted file's location
+                        setTimeout(() => {
+                            window.location.href = response.redirect_url;
+                        }, 1000); // Redirect after 1 second
+                    } else {
+                        status.innerHTML = '<p style="color: red;">Upload failed. Please try again.</p>';
+                        progressBar.style.backgroundColor = '#f44336';
+                    }
+                };
+
+                xhr.onerror = function() {
+                    status.innerHTML = '<p style="color: red;">An error occurred during the upload.</p>';
+                };
+
+                xhr.send(formData);
+            });
+        </script>
+    </body>
+    </html>

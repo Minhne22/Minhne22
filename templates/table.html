@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thống Kê</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Thống kê thông tin</h1>
+    <table>
+<!--        <thead>-->
+<!--            <tr>-->
+<!--                <th>Column 1</th>-->
+<!--                <th>Column 2</th>-->
+<!--                <th>Column 3</th>-->
+<!--            </tr>-->
+<!--        </thead>-->
+        <tbody>
+            {% for row in data_list %}
+            <tr>
+                {% for col in row %}
+                <td>
+                    {% if col.startswith('/') %}
+                    <a href="{{ col }}" target="_blank">
+                        {{ col }}
+                    </a>
+                    {% else %}
+                    {{ col }}
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
